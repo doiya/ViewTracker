@@ -85,13 +85,13 @@ function drawLandmarks(detections){
     const leftEyeToNose = Math.abs(leftEye[0]._x - nose[0]._x);
     const NoseToRightEye = Math.abs(nose[0]._x - rightEye[0]._x);
     if (leftEyeToNose / NoseToRightEye < 3/5) {
-        console.log('下手');
+        // console.log('下手');
         cameraPosition = 0;
     } else if (leftEyeToNose / NoseToRightEye < 5/3) {
-        console.log('上手');
+        // console.log('上手');
         cameraPosition = 1;
     } else {
-        console.log('正面');
+        // console.log('正面');
         cameraPosition = 2;
     }
     
@@ -135,7 +135,7 @@ function switchCamera() {
   textSize(20);
   fill(255, 255, 255);
   if (cameraPosition === 2) {
-    text('下手カメラ', 120, videoHeight + 125);
+    text('上手カメラ', 120, videoHeight + 125);
     return;
   }
   if (cameraPosition === 1) {
@@ -143,7 +143,7 @@ function switchCamera() {
     return;
   }
   if (cameraPosition === 0) {
-    text('上手カメラ', 420, videoHeight + 125);
+    text('下手カメラ', 420, videoHeight + 125);
     return;
   }
 }
