@@ -14,7 +14,7 @@ function setup() {
   // カメラから読み込む
   // video = createCapture(VIDEO);
   // ファイルから読み込む
-  video = createVideo('http://localhost:8000/ViewTracker/img/mr_fuji.mp4');
+  video = createVideo('img/mr_fuji.mp4');
   video.elt.onloadeddata = function () {
     videoWidth = video.width;
     videoHeight = video.height;
