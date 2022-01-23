@@ -4,7 +4,6 @@ const app = express();
 const expressWs = require('express-ws')(app)
 
 var clients=[]; // クライアントのリスト
-var id;
 
 const today = new Date(); 
 const recordDirectory = "./record/" + today.getFullYear() + "-" + today.getMonth() + 1 + "-" + today.getDate() + "/";
@@ -65,9 +64,6 @@ const saveImg = (data) => {
       if(err){
         console.log(err);
         io.emit('msg', '保存失敗');
-      }else{
-        console.log('capture.jpgで保存');
-        // io.emit('msg', '保存完了');
       }
     });
   };

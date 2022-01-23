@@ -94,8 +94,7 @@ function gotResults(err, result) {
   if (detections[0]) {
     const _now = Date.now();
     if (_now - nowTime > 1000) {
-      const nowDate = Date(_now);
-
+      btn.click();
       nowTime = _now;
     }
   }
@@ -103,7 +102,9 @@ function gotResults(err, result) {
 }
 
 function drawBox(detections){
-  for(let i = 0; i < detections.length; i++){
+  // 一旦複数人は扱わない
+  // for(let i = 0; i < detections.length; i++){
+    let i = 0;
     const alignedRect = detections[i].alignedRect;
     const x = alignedRect._box._x
     const y = alignedRect._box._y
@@ -114,7 +115,7 @@ function drawBox(detections){
     stroke(161, 95, 251);
     strokeWeight(2);
     rect(x, y, boxWidth, boxHeight);
-  }  
+  // }  
 }
 
 function drawLandmarks(detections){
