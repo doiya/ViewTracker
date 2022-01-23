@@ -53,10 +53,11 @@ function setup() {
   });
 
   // カメラから読み込む
-  // video = createCapture(VIDEO);
+  video = createCapture(VIDEO);
+  video.elt.onloadedmetadata = function () {
   // ファイルから読み込む
-  video = createVideo('img/mr_fuji.mp4');
-  video.elt.onloadeddata = function () {
+  // video = createVideo('img/mr_fuji.mp4');
+  // video.elt.onloadeddata = function () {
     videoWidth = video.width;
     videoHeight = video.height;
     const canvas = createCanvas(videoWidth, videoHeight + 200);
