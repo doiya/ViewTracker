@@ -1,0 +1,23 @@
+{
+  "name": "viewtracker",
+  "version": "1.0.0",
+  "description": "## 概要",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doiya/ViewTracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/doiya/ViewTracker/issues"
+  },
+  "homepage": "https://github.com/doiya/ViewTracker#readme",
+  "dependencies": {
+    "express": "^4.17.2",
+    "express-ws": "^5.0.2"
+  }
+}

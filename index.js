@@ -4,6 +4,7 @@ let videoWidth;
 let videoHeight;
 let detections;
 let cameraPosition;
+let nowTime;
 
 const detection_options = {
     withLandmarks: true,
@@ -11,6 +12,46 @@ const detection_options = {
 }
 
 function setup() {
+
+  let sock = new WebSocket("ws://localhost:8080/echo");
+
+  sock.addEventListener("open", e => {
+      console.log("接続が開かれたときに呼び出されるイベント");
+  });
+
+  sock.addEventListener("message", e => {
+      console.log("サーバーからメッセージを受信したときに呼び出されるイベント");
+  });
+
+  sock.addEventListener("close", e => {
+      console.log("接続が閉じられたときに呼び出されるイベント");
+  });
+
+  sock.addEventListener("error", e => {
+      console.log("エラーが発生したときに呼び出されるイベント");
+  });
+
+  btn.addEventListener("click", e => {
+
+    const getNow = () => {
+      let dt = new Date(),
+          y = dt.getFullYear(),
+          m = ('00' + (dt.getMonth()+1)).slice(-2),
+          d = ('00' + dt.getDate()).slice(-2),
+          h = ('00' + dt.getHours()).slice(-2),
+          min = ('00' + dt.getMinutes()).slice(-2),
+          s = ('00' + dt.getSeconds()).slice(-2);
+      return `${y}-${m}-${d}T${h}:${min}:${s}`;
+    };
+
+    let data = {
+      "date": getNow(),
+      "coordinates": JSON.stringify(detections[0].parts),
+      "img": canvas.toDataURL("image/jpeg")
+    };
+    sock.send(JSON.stringify(data));
+  });
+
   // カメラから読み込む
   // video = createCapture(VIDEO);
   // ファイルから読み込む
@@ -23,6 +64,7 @@ function setup() {
   };
   video.elt.muted = true;
   video.hide();
+  nowTime = Date.now();
   faceapi = ml5.faceApi(video.loop(), detection_options, modelReady)
 }
 
@@ -43,12 +85,20 @@ function gotResults(err, result) {
   image(video, 0,0, videoWidth, videoHeight)
   if (detections) {
       if (detections.length > 0) {
-          drawBox(detections)
-          drawLandmarks(detections)
+          drawBox(detections);
+          drawLandmarks(detections);
       }
   }
   pop();
   switchCamera();
+  if (detections[0]) {
+    const _now = Date.now();
+    if (_now - nowTime > 1000) {
+      const nowDate = Date(_now);
+
+      nowTime = _now;
+    }
+  }
   faceapi.detect(gotResults)
 }
 
