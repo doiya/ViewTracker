@@ -44,11 +44,20 @@ function setup() {
       return `${y}-${m}-${d}T${h}:${min}:${s}`;
     };
 
-    let data = {
-      "date": getNow(),
-      "coordinates": JSON.stringify(detections[0].parts),
-      "img": canvas.toDataURL("image/jpeg")
-    };
+    let data;
+    if (detections[0]) {
+      data = {
+        "date": getNow(),
+        "coordinates": JSON.stringify(detections[0].parts),
+        "img": canvas.toDataURL("image/jpeg")
+      };
+    } else {
+      data = {
+        "date": getNow(),
+        "coordinates": "error",
+        "img": canvas.toDataURL("image/jpeg")
+      };
+    }
     sock.send(JSON.stringify(data));
   });
 
@@ -74,6 +83,11 @@ function modelReady() {
 }
 
 function gotResults(err, result) {
+  const _now = Date.now();
+  if (_now - nowTime > 1000) {
+    btn.click();
+    nowTime = _now;
+  }
   if (err) {
       console.log(err)
       faceapi.detect(gotResults)
@@ -93,11 +107,11 @@ function gotResults(err, result) {
   pop();
   switchCamera();
   if (detections[0]) {
-    const _now = Date.now();
-    if (_now - nowTime > 1000) {
-      btn.click();
-      nowTime = _now;
-    }
+    // const _now = Date.now();
+    // if (_now - nowTime > 1000) {
+    //   btn.click();
+    //   nowTime = _now;
+    // }
   }
   faceapi.detect(gotResults)
 }
