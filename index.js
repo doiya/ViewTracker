@@ -147,19 +147,8 @@ function drawLandmarks(detections){
     // console.log('leftEye: ' + leftEye[0]._x, ', ' + leftEye[3]._y);
     // console.log('nose: ' + nose[0]._x + ', ' + nose[0]._y);
     // console.log('rightEye: ' + rightEye[3]._x + ', ' + rightEye[0]._y);
-    
-    const leftEyeToNose = Math.abs(leftEye[0]._x - nose[0]._x);
-    const NoseToRightEye = Math.abs(nose[0]._x - rightEye[0]._x);
-    if (leftEyeToNose / NoseToRightEye < 3/5) {
-        // console.log('下手');
-        cameraPosition = 0;
-    } else if (leftEyeToNose / NoseToRightEye < 5/3) {
-        // console.log('上手');
-        cameraPosition = 1;
-    } else {
-        // console.log('正面');
-        cameraPosition = 2;
-    }
+
+    cameraPosition = detectCameraPosition(leftEye, rightEye);
     
     drawPart(mouth, true);
     drawPart(nose, false);
@@ -183,6 +172,38 @@ function drawPart(feature, closed){
     endShape(CLOSE);
   } else {
     endShape();
+  }
+}
+
+function detectCameraPosition(leftEye, nose, rightEye) {
+  const leftEyeToNose = Math.abs(leftEye[0]._x - nose[0]._x);
+  const NoseToRightEye = Math.abs(nose[0]._x - rightEye[3]._x);
+  if (leftEyeToNose / NoseToRightEye < 3/5) {
+      // console.log('下手');
+      return 0;
+  } else if (leftEyeToNose / NoseToRightEye < 5/3) {
+      // console.log('正面');
+      return 1;
+  } else {
+      // console.log('上手');
+      return 2;
+  }
+}
+
+function detectCameraPosition(leftEye, rightEye) {
+  const leftEyeLength = Math.abs(leftEye[3]._x - leftEye[0]._x);
+  const rightEyeLength = Math.abs(rightEye[3]._x - rightEye[0]._x);
+  console.log('leftEyeLength : ' + leftEyeLength);
+  console.log('rightEyeLength : ' + rightEyeLength)
+  if (leftEyeLength / rightEyeLength < 8/10) {
+      // console.log('下手');
+      return 0;
+  } else if (leftEyeLength / rightEyeLength < 10/8) {
+      // console.log('正面');
+      return 1;
+  } else {
+      // console.log('上手');
+      return 2;
   }
 }
 
