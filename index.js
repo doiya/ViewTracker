@@ -193,12 +193,12 @@ function detectCameraPosition(leftEye, nose, rightEye) {
 function detectCameraPosition(leftEye, rightEye) {
   const leftEyeLength = Math.abs(leftEye[3]._x - leftEye[0]._x);
   const rightEyeLength = Math.abs(rightEye[3]._x - rightEye[0]._x);
-  console.log('leftEyeLength : ' + leftEyeLength);
-  console.log('rightEyeLength : ' + rightEyeLength)
-  if (leftEyeLength / rightEyeLength < 8/10) {
+  // console.log('leftEyeLength : ' + leftEyeLength);
+  // console.log('rightEyeLength : ' + rightEyeLength)
+  if (leftEyeLength / rightEyeLength < 9/10) {
       // console.log('下手');
       return 0;
-  } else if (leftEyeLength / rightEyeLength < 10/8) {
+  } else if (leftEyeLength / rightEyeLength < 10/9) {
       // console.log('正面');
       return 1;
   } else {
