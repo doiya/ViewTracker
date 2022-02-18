@@ -42,7 +42,16 @@ app.get('/', function(req, res) {
     });
 });
 
-app.use(express.static('./'));
+// app.get('/capture', function(req, res) {
+//     fs.readFile("./capture.html", function (err, data) {
+//         res.writeHead(200, { "Content-Type": "text/html" });
+//         res.write(data);
+//         res.end();
+//     });
+// });
+
+app.use('/public', express.static('public'));
+
 app.listen(8080, () => console.log('app start port 8080.'));
 
 
