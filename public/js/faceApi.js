@@ -5,6 +5,7 @@ let videoHeight;
 let detections;
 let cameraPosition;
 let nowTime;
+let startTime;
 
 const detection_options = {
     withLandmarks: true,
@@ -33,27 +34,27 @@ function setup() {
 
   btn.addEventListener("click", e => {
 
-    const getNow = () => {
-      let dt = new Date(),
-          y = dt.getFullYear(),
-          m = ('00' + (dt.getMonth()+1)).slice(-2),
-          d = ('00' + dt.getDate()).slice(-2),
-          h = ('00' + dt.getHours()).slice(-2),
-          min = ('00' + dt.getMinutes()).slice(-2),
-          s = ('00' + dt.getSeconds()).slice(-2);
-      return `${y}-${m}-${d}T${h}:${min}:${s}`;
-    };
+    // const getNow = () => {
+    //   let dt = new Date(),
+    //       y = dt.getFullYear(),
+    //       m = ('00' + (dt.getMonth()+1)).slice(-2),
+    //       d = ('00' + dt.getDate()).slice(-2),
+    //       h = ('00' + dt.getHours()).slice(-2),
+    //       min = ('00' + dt.getMinutes()).slice(-2),
+    //       s = ('00' + dt.getSeconds()).slice(-2);
+    //   return `${y}-${m}-${d}T${h}:${min}:${s}`;
+    // };
 
     let data;
     if (detections[0]) {
       data = {
-        "date": getNow(),
+        "date": timer(),
         "coordinates": JSON.stringify(detections[0].parts),
         "img": canvas.toDataURL("image/jpeg")
       };
     } else {
       data = {
-        "date": getNow(),
+        "date": timer(),
         "coordinates": "error",
         "img": canvas.toDataURL("image/jpeg")
       };
@@ -62,11 +63,12 @@ function setup() {
   });
 
   // カメラから読み込む
-  video = createCapture(VIDEO);
-  video.elt.onloadedmetadata = function () {
+  // video = createCapture(VIDEO);
+  // video.elt.onloadedmetadata = function () {
   // ファイルから読み込む
   // video = createVideo('img/mr_fuji.mp4');
-  // video.elt.onloadeddata = function () {
+  video = createVideo('../img/GEKI_Dance_Face_hidden.mp4');
+  video.elt.onloadeddata = function () {
     videoWidth = video.width;
     videoHeight = video.height;
     const canvas = createCanvas(videoWidth, videoHeight + 200);
@@ -74,8 +76,10 @@ function setup() {
   };
   video.elt.muted = true;
   video.hide();
+  video.loop = false;
   nowTime = Date.now();
-  faceapi = ml5.faceApi(video.loop(), detection_options, modelReady)
+  startTime = nowTime;
+  faceapi = ml5.faceApi(video.play(), detection_options, modelReady)
 }
 
 function modelReady() {
@@ -85,7 +89,7 @@ function modelReady() {
 function gotResults(err, result) {
   const _now = Date.now();
   if (_now - nowTime > 1000) {
-    btn.click();
+    // btn.click();
     nowTime = _now;
   }
   if (err) {
@@ -117,8 +121,7 @@ function gotResults(err, result) {
 }
 
 function drawBox(detections){
-  // 一旦複数人は扱わない
-  // for(let i = 0; i < detections.length; i++){
+  for(let i = 0; i < detections.length; i++){
     let i = 0;
     const alignedRect = detections[i].alignedRect;
     const x = alignedRect._box._x
@@ -130,14 +133,19 @@ function drawBox(detections){
     stroke(161, 95, 251);
     strokeWeight(2);
     rect(x, y, boxWidth, boxHeight);
-  // }  
+  }  
 }
 
 function drawLandmarks(detections){
   noFill();
-  stroke(161, 95, 251)
+  // stroke(161, 95, 251)
   strokeWeight(2)
   for(let i = 0; i < detections.length; i++){
+    if (i == 0) {
+      stroke('red');
+    } else {
+      stroke(161, 95, 251);
+    }
     const mouth = detections[i].parts.mouth; 
     const nose = detections[i].parts.nose;
     const leftEye = detections[i].parts.leftEye;
@@ -147,18 +155,9 @@ function drawLandmarks(detections){
     // console.log('leftEye: ' + leftEye[0]._x, ', ' + leftEye[3]._y);
     // console.log('nose: ' + nose[0]._x + ', ' + nose[0]._y);
     // console.log('rightEye: ' + rightEye[3]._x + ', ' + rightEye[0]._y);
-    
-    const leftEyeToNose = Math.abs(leftEye[0]._x - nose[0]._x);
-    const NoseToRightEye = Math.abs(nose[0]._x - rightEye[0]._x);
-    if (leftEyeToNose / NoseToRightEye < 3/5) {
-        // console.log('下手');
-        cameraPosition = 0;
-    } else if (leftEyeToNose / NoseToRightEye < 5/3) {
-        // console.log('上手');
-        cameraPosition = 1;
-    } else {
-        // console.log('正面');
-        cameraPosition = 2;
+
+    if (i == 0) {
+      cameraPosition = detectCameraPosition(leftEye, rightEye);
     }
     
     drawPart(mouth, true);
@@ -183,6 +182,38 @@ function drawPart(feature, closed){
     endShape(CLOSE);
   } else {
     endShape();
+  }
+}
+
+function detectCameraPosition(leftEye, nose, rightEye) {
+  const leftEyeToNose = Math.abs(leftEye[0]._x - nose[0]._x);
+  const NoseToRightEye = Math.abs(nose[0]._x - rightEye[3]._x);
+  if (leftEyeToNose / NoseToRightEye < 3/5) {
+      // console.log('下手');
+      return 0;
+  } else if (leftEyeToNose / NoseToRightEye < 5/3) {
+      // console.log('正面');
+      return 1;
+  } else {
+      // console.log('上手');
+      return 2;
+  }
+}
+
+function detectCameraPosition(leftEye, rightEye) {
+  const leftEyeLength = Math.abs(leftEye[3]._x - leftEye[0]._x);
+  const rightEyeLength = Math.abs(rightEye[3]._x - rightEye[0]._x);
+  // console.log('leftEyeLength : ' + leftEyeLength);
+  // console.log('rightEyeLength : ' + rightEyeLength)
+  if (leftEyeLength / rightEyeLength < 9/10) {
+      // console.log('下手');
+      return 0;
+  } else if (leftEyeLength / rightEyeLength < 10/9) {
+      // console.log('正面');
+      return 1;
+  } else {
+      // console.log('上手');
+      return 2;
   }
 }
 
@@ -212,4 +243,28 @@ function switchCamera() {
     text('下手カメラ', 420, videoHeight + 125);
     return;
   }
+}
+
+function timer() {
+  let elapsedTime = nowTime - startTime;
+  //m(分) = 135200 / 60000ミリ秒で割った数の商　-> 2分
+  let m = Math.floor(elapsedTime / 60000);
+
+  //s(秒) = 135200 % 60000ミリ秒で / 1000 (ミリ秒なので1000で割ってやる) -> 15秒
+  let s = Math.floor(elapsedTime % 60000 / 1000);
+
+  //ms(ミリ秒) = 135200ミリ秒を % 1000ミリ秒で割った数の余り
+  let ms = elapsedTime % 1000;
+
+
+  //HTML 上で表示の際の桁数を固定する　例）3 => 03　、 12 -> 012
+  //javascriptでは文字列数列を連結すると文字列になる
+  //文字列の末尾2桁を表示したいのでsliceで負の値(-2)引数で渡してやる。
+  m = ('0' + m).slice(-2); 
+  s = ('0' + s).slice(-2);
+  ms = ('0' + ms).slice(-3);
+
+  //HTMLのid　timer部分に表示させる　
+  let textContent = m + ':' + s + ':' + ms;
+  return textContent;
 }
