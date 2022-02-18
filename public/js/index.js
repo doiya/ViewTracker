@@ -14,7 +14,7 @@ function setup() {
   // カメラから読み込む
   // video = createCapture(VIDEO);
   // ファイルから読み込む
-  video = createVideo('img/mr_fuji.mp4');
+  video = createVideo('public/img/mr_fuji.mp4');
   video.elt.onloadeddata = function () {
     videoWidth = video.width;
     videoHeight = video.height;
