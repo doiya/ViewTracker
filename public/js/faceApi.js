@@ -67,7 +67,7 @@ function setup() {
   // video.elt.onloadedmetadata = function () {
   // ファイルから読み込む
   // video = createVideo('img/mr_fuji.mp4');
-  video = createVideo('../img/GEKI_Dance_Face_hidden.mp4');
+  video = createVideo('../img/GEKI_Dance_Face.mp4');
   video.elt.onloadeddata = function () {
     videoWidth = video.width;
     videoHeight = video.height;
